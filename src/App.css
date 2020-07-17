@@ -1,9 +1,9 @@
-*{
-  background: #282c34;
-}
+
 
 .App {
   /* text-align: center; */
+  background: #282c34;
+
 }
 
 .App-logo {
@@ -76,7 +76,29 @@
 
 .forumLogo {
   height: 200px;
-  width : 175px;
+  width : 200px;
   padding-right: 20px; 
 
+}
+
+/*********************** hr **********************/
+
+hr{
+  padding: 0;
+  margin: 0;
+}
+
+/*********************** SVG **********************/
+
+.RDC_SVG , .SS_SOL_SVG , .NV_BAT_SVG,{
+  display: flex;
+  justify-content: center;
+}
+
+
+/********************* Buttons ********************/
+.buttons{
+  display: flex;
+  justify-content: flex-end;
+  float: right;
 }
