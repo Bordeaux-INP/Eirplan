@@ -5,23 +5,23 @@ function RDC() {
 return(
    <div className="RDC_SVG">  
       <svg
-         xmlnsDc="http://purl.org/dc/elements/1.1/"
-         xmlnsCc="http://creativecommons.org/ns#"
-         xmlnsRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-         xmlnsSvg="http://www.w3.org/2000/svg"
+         // xmlnsDc="http://purl.org/dc/elements/1.1/"
+         // xmlnsCc="http://creativecommons.org/ns#"
+         // xmlnsRdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         // xmlnsSvg="http://www.w3.org/2000/svg"
          xmlns="http://www.w3.org/2000/svg"
-         xmlnsSodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-         xmlnsInkscape="http://www.inkscape.org/namespaces/inkscape"
-         sodipodiDocname="RDC.svg"
-         inkscapeVersion="1.0 (4035a4fb49, 2020-05-01)"
+         // xmlnsSodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+         // xmlnsInkscape="http://www.inkscape.org/namespaces/inkscape"
+         // sodipodiDocname="RDC.svg"
+         // inkscapeVersion="1.0 (4035a4fb49, 2020-05-01)"
          id="svg1386"
          version="1.1"
          viewBox="0 0 210 297"
          height="297mm"
          width="210mm">
-      <defs
-         id="defs1380" />
-      <sodipodiNamedview
+      {/* <defs
+         id="defs1380" /> */}
+      {/* <sodipodiNamedview
          inkscapeWindow-maximized="0"
          inkscapeWindow-y="0"
          inkscapeWindow-x="128"
@@ -39,8 +39,8 @@ return(
          borderopacity="1.0"
          bordercolor="#666666"
          pagecolor="#ffffff"
-         id="base" />
-      <metadata
+         id="base" /> */}
+      {/* <metadata
          id="metadata1383">
          <rdfRDF>
             <ccWork
@@ -51,7 +51,7 @@ return(
             <dcTitle></dcTitle>
             </ccWork>
          </rdfRDF>
-      </metadata>
+      </metadata> */}
       <g
          id="layer1"
          inkscapeGroupmode="layer"
@@ -469,7 +469,7 @@ return(
             < style type="text/css">
             {`.st1{fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1}`}
             </ style>
-            <path   className="st0"
+            <path  
                className="st1"
                sodipodiNodetypes="ccccccsssssccccccccc"
                d="M 104.6994,161.58482 -0.13363476,159.69354 v -49.71213 m 206.69762476,30.81472 -0.36555,21.30284 -65.78029,-0.51415 m 7.18156,-41.38839 c 0,5.21876 -5.45754,9.4494 -12.18974,9.4494 -6.7322,0 -12.18973,-4.23064 -12.18973,-9.4494 0,-5.21876 5.45752,-9.44941 12.18973,-9.44941 6.73221,0 12.18974,4.23064 12.18974,9.44941 z m 58.96428,20.5997 -66.7128,-0.37798 0.56696,21.16667 H 104.6994 l 0.18899,-20.97768 -105.03275491,-1.25807 0.0107302,-29.36766 L 207.13095,93.171131 Z"

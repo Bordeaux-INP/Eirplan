@@ -5,9 +5,14 @@ import NavBar from './components/navBar';
 import RDC from './components/SVGs/RDC';
 import SS_SOL from './components/SVGs/SS_SOL';
 import NV_BAT from './components/SVGs/NV_BAT';
+// import SVG from "./components/SVGs/svg";
+import logo from "./logo.svg"
+import rdc from "./SVG/RDC.svg"
 
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Fab from '@material-ui/core/Fab';
+
 
 
 import './App.css';
@@ -42,16 +47,16 @@ handleClick(view) {
         aria-label="vertical contained primary button group"
         variant="contained"
       >
-        <Button onClick={() => this.handleClick(1)}>Sous Sol</Button>
-        <Button onClick={() => this.handleClick(2)}>RDC</Button>
-        <Button onClick={() => this.handleClick(3)}>Nouv Bat</Button>
+        <Fab onClick={() => this.handleClick(1)}>-1</Fab>
+        <Fab onClick={() => this.handleClick(2)}>0</Fab>
+        <Fab onClick={() => this.handleClick(3)}>0N</Fab>
  
       </ButtonGroup>
     </div>
     
     {view === 1 ? <SS_SOL /> : view === 2 ? <RDC /> :  <NV_BAT />}
 
- 
+      {/* <img src={rdc} className="rdc" alt="rdc" /> */} 
 
     </div>  
 

@@ -90,7 +90,7 @@ hr{
 
 /*********************** SVG **********************/
 
-.RDC_SVG , .SS_SOL_SVG , .NV_BAT_SVG,{
+.RDC_SVG , .SS_SOL_SVG , .NV_BAT_SVG{
   display: flex;
   justify-content: center;
 }
@@ -101,4 +101,8 @@ hr{
   display: flex;
   justify-content: flex-end;
   float: right;
+}
+
+#buffet:hover{
+background-color: aqua;
 }
