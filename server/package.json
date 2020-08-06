@@ -11,5 +11,10 @@
     "api"
   ],
   "author": "Amera AL KTABE",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "mongoose": "^5.9.27",
+    "nodemon": "^2.0.4"
+  }
 }
