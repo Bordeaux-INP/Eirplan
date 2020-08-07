@@ -7,8 +7,11 @@ Set up npm on your PC : https://www.npmjs.com/get-npm
 Download Node Js on your PC: https://nodejs.org/en/download/current/
 
 Download all packages for Node Js: npm install --save express
+
 				   npm install --save nodeman
+
 				   npm install --save mongoose
+
 				   npm install --save body-parser
 
 Download material_UI package for React : npm install @material-ui/core
