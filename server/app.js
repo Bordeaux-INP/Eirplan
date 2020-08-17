@@ -14,29 +14,27 @@ const app = express();
 
 app.set('view engine', 'ejs'); 
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(methodOverride('_methode'));
 
 const mongoURI = 'mongodb+srv://eirplan:eirplan@eirplan.dprmb.mongodb.net/Eirplan?retryWrites=true&w=majority';
     
-const conn = mongoose.createConnection(
-    'mongodb+srv://eirplan:eirplan@eirplan.dprmb.mongodb.net/Eirplan?retryWrites=true&w=majority',
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }
-);
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+const conn = mongoose.connection;
 
 let gfs;
-
 
 // conn.on('error', console.error.bind(console, 'connection error:'));
 conn.once('open', () => {
     console.log("\nConnected to DB !");
     //Init stream
     gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection('uploads');
+    gfs.collection('plan');
 });
 
 //Create storage engine
@@ -46,32 +44,55 @@ const storage = new GridFsStorage({
       return new Promise((resolve, reject) => {
         crypto.randomBytes(16, (err, buf) => {
           if (err) {
+
+            console.log('err reject');
             return reject(err);
           }
           const filename = buf.toString('hex') + path.extname(file.originalname);
           const fileInfo = {
             filename: filename,
-            bucketName: 'uploads'
+            bucketName: 'plan'
           };
+          console.log('resolve :', filename,fileInfo);
+
           resolve(fileInfo);
         });
       });
     }
   });
-  const upload = multer({ storage });
+const plan = multer({ storage });
 
 // @route GET /
 // @desc Loads form
 app.get('/', (req, res) => {
-    res.render('index');
+    gfs.files.find().toArray((err, files) => {
+        // Check if files
+        if (!files || files.length === 0) {
+          res.render('index', { files: false });
+        } else {
+          files.map(file => {
+            if (
+              file.contentType === 'image/svg'
+            ) {
+              file.isImage = true;
+            } else {
+              file.isImage = false;
+            }
+          });
+          res.render('index', { files: files });
+        }
+      });
 });
 
 // @route POST /plan
 // @desc Uploads file to DB
 
-app.post('/upload', upload.single('file'), (req, res) => {
-    // res.json({file : req.file});
-    res.redirect('/');
+app.post('/post',  (req, res) => {
+    // console.log(file);
+    // req.file.save();
+    return res.json({file : req.file});
+
+    // res.redirect('/');
 });
 
 // @route GET /files
@@ -125,23 +146,22 @@ app.get('/image/:filename', (req, res) => {
     });
 });
 
-mongoose.Promise = global.Promise;
 
 // app.use('/data',dataRoutes);
 
-app.use((req, res, next) => {
-    const error = new Error('Not found');
-    error.status(404);
-    next(error);
-});
+// app.use((req, res, next) => {
+//     const error = new Error('Not found');
+//     error.status(404);
+//     next(error);
+// });
 
-app.use((error, req, res, next) => {
-    res.status(error.status || 500);
-    res.json({
-        error: {
-            message: error.message,
-        }
-    });
-});
+// app.use((error, req, res, next) => {
+//     res.status(error.status || 500);
+//     res.json({
+//         error: {
+//             message: error.message,
+//         }
+//     });
+// });
 
 module.exports = app;
