@@ -29,7 +29,7 @@ const conn = mongoose.connection;
 
 let gfs;
 
-// conn.on('error', console.error.bind(console, 'connection error:'));
+conn.on('error', console.error.bind(console, 'connection error:'));
 conn.once('open', () => {
     console.log("\nConnected to DB !");
     //Init stream
@@ -41,7 +41,11 @@ conn.once('open', () => {
 const storage = new GridFsStorage({
     url: mongoURI,
     file: (req, file) => {
+        console.log('storage');
+
       return new Promise((resolve, reject) => {
+        console.log('Promise');
+
         crypto.randomBytes(16, (err, buf) => {
           if (err) {
 
@@ -60,7 +64,7 @@ const storage = new GridFsStorage({
       });
     }
   });
-const plan = multer({ storage });
+const plan = multer({ storage : storage });
 
 // @route GET /
 // @desc Loads form
@@ -72,7 +76,7 @@ app.get('/', (req, res) => {
         } else {
           files.map(file => {
             if (
-              file.contentType === 'image/svg'
+              file.contentType === 'image/svg+xml' || file.contentType === 'image/png'
             ) {
               file.isImage = true;
             } else {
@@ -87,12 +91,12 @@ app.get('/', (req, res) => {
 // @route POST /plan
 // @desc Uploads file to DB
 
-app.post('/post',  (req, res) => {
+app.post('/post', plan.single('file'), (req, res) => {
     // console.log(file);
     // req.file.save();
-    return res.json({file : req.file});
+    // return res.json({file : req.file});
 
-    // res.redirect('/');
+    res.redirect('/');
 });
 
 // @route GET /files
@@ -134,7 +138,7 @@ app.get('/image/:filename', (req, res) => {
             });
         }
         //check if image
-        if(file.contentType == 'image/svg'){
+        if(file.contentType == 'image/svg+xml' || file.contentType === 'image/png'){
             //Read output tp browser
             const readstream = gfs.createReadStream(file.filename);
             readstream.pipe(res);
@@ -143,6 +147,17 @@ app.get('/image/:filename', (req, res) => {
                 err : 'Not an SVG'
             });
         }
+    });
+});
+
+// @route DELETE /files/:id
+// @desc Delete file
+app.delete('/files/:id', (req, res) => {
+    gfs.remove({_id: req.params.id, root: 'plan'}, (err, gridStore) => {
+        if (err){
+            return res.status(404).json({err: err});
+        }
+        res.redirect('/');
     });
 });
 
