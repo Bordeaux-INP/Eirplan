@@ -1,20 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const multer = require('multer');
-const GridFsStorage = require('multer-gridfs-storage');
+// const multer = require('multer');
+// const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 const methodOverride = require('method-override');
-const crypto = require('crypto');
+// const crypto = require('crypto');
 const path = require('path');
 
-const XmlReader = require('./xmlReader');
-let RDC = XmlReader.svgReader('RDC.svg');
-console.log('RDC', RDC);
 
-// console.log('xmlReader', XmlReader);
-// const dataRoutes = require('./api/routes/datas');
-const floorRoutes = require('./api/routes/floors');
+const eventRoutes = require('./api/routes/events');
+const svgToSchemaRoutes = require('./api/routes/svgToSchema');
+const storageFunction = require('./utils/storageFunction');
+
+const conn = require('./utils/connection');
+const mongoURI = 'mongodb+srv://eirplan:eirplan@eirplan.dprmb.mongodb.net/Eirplan?retryWrites=true&w=majority';
+
 
 const app = express();
 
@@ -24,60 +25,64 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(methodOverride('_methode'));
 
-const mongoURI = 'mongodb+srv://eirplan:eirplan@eirplan.dprmb.mongodb.net/Eirplan?retryWrites=true&w=majority';
-    
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+let gfs_svg;
+let gfs_event_logo;
+let gfs_host_logo;
 
-const conn = mongoose.connection;
 
-let gfs;
-
-conn.on('error', console.error.bind(console, 'connection error:'));
 conn.once('open', () => {
     console.log("\nConnected to DB !");
-    //Init stream
-    gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection('plan');
+    //Init stream svg
+    gfs_svg = Grid(conn.db, mongoose.mongo);
+    gfs_svg.collection('floor');
+
+    //Init stream event logo
+    gfs_event_logo = Grid(conn.db, mongoose.mongo);
+    gfs_event_logo.collection('event_logo');
+
+    //Init stream host logo
+    gfs_host_logo = Grid(conn.db, mongoose.mongo);
+    gfs_host_logo.collection('host_logo');
+
+    console.log('Created collections');
 });
 
-//Create storage engine
-const storage = new GridFsStorage({
-    url: mongoURI,
-    file: (req, file) => {
-        console.log('storage');
+// *************************** Upload SVG to Data Base *****************************************//
 
-      return new Promise((resolve, reject) => {
-        console.log('Promise');
 
-        crypto.randomBytes(16, (err, buf) => {
-          if (err) {
+const floorStorage = storageFunction('floor', mongoURI);
+const eventLogoStorage = storageFunction('event_logo', mongoURI);
+const hostLogoStorage = storageFunction('host_logo', mongoURI);
 
-            console.log('err reject');
-            return reject(err);
-          }
-          const filename = file.originalname;
-          const fileInfo = {
-            filename: filename,
-            bucketName: 'plan'
-          };
-          console.log('resolve :', filename,fileInfo);
+function uploadWrapper(req, res) {
+  try{
+    console.log('start try');
 
-          resolve(fileInfo);
-        });
-      });
-    }
-  });
-const plan = multer({ storage : storage });
+    eventLogoStorage.single('file_event_logo');
+    console.log('event');
 
-// module.exports = plan;
+    hostLogoStorage.single('file_host_logo');
+    console.log('host');
+    floorStorage.single('file_floor');
+    console.log('file floor');
+
+
+
+  }catch(err){
+    console.log('Post error:', err)
+  }
+  
+
+}
+
+async function getFloors (req, res){
+  
+}
 
 // @route GET /
 // @desc Loads form
 app.get('/', (req, res) => {
-  gfs.files.find().toArray((err, files) => {
+  gfs_svg.files.find().toArray((err, files) => {
       // Check if files
       if (!files || files.length === 0) {
         res.render('index', { files: false });
@@ -96,48 +101,31 @@ app.get('/', (req, res) => {
     });
 });
 
-// @route Post /
-// @desc post schema
 
-// app.post('/post', (req, res) => {
-//   const floor = new Floor({
-//       _id: new mongoose.Types.ObjectId(),
-//       name: req.body.name,
-//       description: req.body.description,
-//       svg : plan.single('file')
-//   });
+// user click on submit button => uploads all the file to DBs
+// app.post('/post', uploadWrapper, (req, res) => {
 
-//   floor
-//    .save()
-//   .then(result => {
-//       console.log(result);
-//   })
-//  .catch(err => console.log(err)) ;
-//  res.status(200).json({
-//       message : 'Handeling POST requests to /datas',
-//       createdData: floor
-//   });
-  
 //   res.redirect('/');
+//   res.end('done');
 
 // });
 
-
-// @route POST /plan
-// @desc Uploads file to DB
-
-app.post('/post', plan.single('file'), (req, res) => {
-    // console.log(file);
-    // req.file.save();
-    // return res.json({file : req.file});
-
-    res.redirect('/');
+app.post('/post',floorStorage.single('file_floor'),(req,res) =>{
+  res.redirect('/');
 });
+// app.post('/post',eventLogoStorage.single('file_event_logo'),(req,res) =>{
+//   res.redirect('/');
+// });
+
+// app.post('/post',hostLogoStorage.single('file_host_logo'),(req,res) =>{
+//   res.redirect('/');
+// });
+
 
 // @route GET /files
 // @desc Display all files in JSON
 app.get('/files', (req, res) => {
-  gfs.files.find().toArray((err, files) => {
+  gfs_svg.files.find().toArray((err, files) => {
       if(!files || files.length === 0){
           return res.status(404).json({
               err : 'No files exist'
@@ -152,7 +140,7 @@ app.get('/files', (req, res) => {
 // @route GET /file/:filename
 // @desc Display one file in JSON
 app.get('/files/:filename', (req, res) => {
-  gfs.files.findOne({filename : req.params.filename}, (err, file) => {
+  gfs_svg.files.findOne({filename : req.params.filename}, (err, file) => {
       if(!file || file.length === 0 ){
           return res.status(404).json({
               err : 'No file exists'
@@ -166,16 +154,17 @@ app.get('/files/:filename', (req, res) => {
 // @route GET /Image/:filename
 // @desc Display one file in JSON
 app.get('/image/:filename', (req, res) => {
-  gfs.files.findOne({filename : req.params.filename}, (err, file) => {
+  gfs_svg.files.findOne({filename : req.params.filename}, (err, file) => {
       if(!file || file.length === 0 ){
           return res.status(404).json({
               err : 'No file exists'
           });
       }
       //check if image
-      if(file.contentType == 'image/svg+xml'){
+      if(file.contentType === 'image/svg+xml'){
           //Read output tp browser
-          const readstream = gfs.createReadStream(file.filename);
+          const readstream = gfs_svg.createReadStream(file.filename);
+          console.log('File',file);
           readstream.pipe(res);
          
       } else {
@@ -191,7 +180,7 @@ app.get('/image/:filename', (req, res) => {
 // @route DELETE /files/:id
 // @desc Delete file
 app.delete('/files/:id', (req, res) => {
-  gfs.remove({_id: req.params.id, root: 'plan'}, (err, gridStore) => {
+  gfs_svg.remove({_id: req.params.id, root: 'floor'}, (err, gridStore) => {
       if (err){
           return res.status(404).json({err: err});
       }
@@ -200,9 +189,27 @@ app.delete('/files/:id', (req, res) => {
 });
 
 
+// @route DELETE /image/:id
+// @desc Delete file
+app.delete('/image/:id', (req, res) => {
+  gfs_svg.remove({_id: req.params.id, root: 'floor'}, (err, gridStore) => {
+      if (err){
+          return res.status(404).json({err: err});
+      }
+      res.redirect('/');
+  });
+});
 
-// app.use('/data',dataRoutes);
-// app.use('/floor',floorRoutes);
+app.get('/download', function(req, res){
+  const file = `${__dirname}/upload-folder/`;
+  res.download(file); // Set disposition and send it.
+});
+
+
+// ****************************************************************************** //
+
+app.use('/svgToSchema', svgToSchemaRoutes);
+
 
 
 // app.use((req, res, next) => {

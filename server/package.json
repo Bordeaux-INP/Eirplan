@@ -24,6 +24,7 @@
     "multer-gridfs-storage": "^4.2.0",
     "nodemon": "^2.0.4",
     "path": "^0.12.7",
-    "util": "^0.12.3"
+    "util": "^0.12.3",
+    "xml2json": "^0.12.0"
   }
 }

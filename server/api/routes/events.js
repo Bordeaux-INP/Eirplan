@@ -1,59 +1,59 @@
-const express = require('express');
-const router = express.Router();
+// const express = require('express');
+// const router = express.Router();
 
-const mongoose = require('mongoose');
-
-const LocalKeywords = require('../models/event');
-const Floor = require('../models/event');
-const Plan = require('../models/event');
-const Event = require('../models/event');
+// const mongoose = require('mongoose');
 
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message : "Handeling GET requests to /datas",
-    });
-});
+// const Plan = require('../models/plan');
+// const Event = require('../models/event');
 
-router.post('/', (req, res, next) => {
-    const localKeywords = new LocalKeywords({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        description: req.body.description,
-        logo: req.body.logo,
 
-    });
-
-    data
-     .save()
-    .then(result => {
-        console.log(result);
-    })
-   .catch(err => console.log(err)) ;
-   res.status(200).json({
-        message : 'Handeling POST requests to /datas',
-        createdData: data
-    });
-    
-
-});
-
-router.get("/:dataId", (req, res, next) => {
-    const id = req.params.dataId;
-    Data.findById(id)
-    .exec()
-    .then(doc => {
-        console.log(doc);
-        res.status(200).json(doc);
-    })
-    .catch(err => {
-        console.log(err),
-        res.status(500).json({error :err});
-    });
-})
-
-// router.post('/:dataId', (req, res, next) => {
-//     const id = req.params.dataId,
-    
+// router.get('/', (req, res, next) => {
+//     res.status(200).json({
+//         message : "Handeling GET requests to /datas",
+//     });
 // });
-module.exports = router;
+
+// router.post('/', (req, res, next) => {
+//     const event = new Event({
+//         _id: new mongoose.Types.ObjectId(),
+//         name: req.body.name,
+//         logo: req.body.logo,
+//         companyLogo: req.body.companyLogo,
+//         plan: Plan
+
+//     });
+
+//     event
+//     .save()
+//     .then(result => {
+//         console.log(result);
+//     })
+//    .catch(err => console.log(err)) ;
+//    res.status(200).json({
+//         message : 'Handeling POST requests to /events',
+//         createdData: event
+//     });
+    
+
+// });
+
+// router.get("/:eventId", (req, res, next) => {
+//     const id = req.params.eventId;
+//     Event.findById(id)
+//     .exec()
+//     .then(doc => {
+//         console.log(doc);
+//         res.status(200).json(doc);
+//     })
+//     .catch(err => {
+//         console.log(err),
+//         res.status(500).json({error :err});
+//     });
+// })
+
+// // router.post('/:dataId', (req, res, next) => {
+// //     const id = req.params.dataId,
+    
+// // });
+// module.exports = router;
