@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(methodOverride('_methode'));
 
-let gfs_svg;
+let gfs_floors;
 let gfs_event_logo;
 let gfs_host_logo;
 
@@ -33,8 +33,8 @@ let gfs_host_logo;
 conn.once('open', () => {
     console.log("\nConnected to DB !");
     //Init stream svg
-    gfs_svg = Grid(conn.db, mongoose.mongo);
-    gfs_svg.collection('floor');
+    gfs_floors = Grid(conn.db, mongoose.mongo);
+    gfs_floors.collection('floor');
 
     //Init stream event logo
     gfs_event_logo = Grid(conn.db, mongoose.mongo);
@@ -75,14 +75,156 @@ function uploadWrapper(req, res) {
 
 }
 
-async function getFloors (req, res){
+function streamToString (stream) {
+  const chunks = []
+  return new Promise((resolve, reject) => {
+    stream.on('data', chunk => chunks.push(chunk))
+    stream.on('error', reject)
+    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
+  })
+}
+
+async function getEventName (req, res){
   
 }
+
+async function getKeyWords (req, res){
+  
+}
+
+async function getLogos(eventId=0){
+  eventLogo = await gfs_event_logo.files.find().toArray();
+  if(!eventLogo || eventLogo.length === 0){
+    return { 
+      status : '404',
+      err : 'Error: Event logo does not exist'
+    };
+  }
+
+  hostLogo = await gfs_host_logo.files.find().toArray();
+  if(!hostLogo || hostLogo.length === 0){
+    return { 
+      status : '404',
+      err : 'Error: Host logo does not exist'
+    };
+  }
+
+  return { 
+    status:'200',
+    eventLogo: eventLogo,
+    hostLogo: hostLogo
+  };
+}
+
+async function getFloors(eventId=0){
+  files = await gfs_floors.files.find().toArray();
+  // console.log('files', files);
+  
+  if(!files || files.length === 0){
+    return { 
+      status : '404',
+      data : 'No floors exist'
+    };
+  }
+  
+  let data = []
+  for (const file of files) {
+    try {
+      if(file && file.length != 0){
+        const readstream = gfs.createReadStream(file.filename);
+        const stringData = await streamToString(readstream);
+        data.push(stringData);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  return { 
+    status:'200',
+    data : data
+  };
+} 
+
+// async function getHostLogo (req, res){
+//   output = await getCollectionData(gfs_host_logo)
+//   res.status(output.status).json({output: output.data})  
+// }
+
+// async function getEventLogo (req, res){
+//   output = await getCollectionData(gfs_event_logo)
+//   res.status(output.status).json({output: output.data})  
+// }
+
+
+// async function getFloors(req, res){
+//   output = await getCollectionData(gfs_floors)
+//   res.status(output.status).json({output: output.data})  
+// }
+
+
+// async function getCollectionData(gfs){
+//   files = await gfs.files.find().toArray();
+//   // console.log('files', files);
+  
+//   if(!files || files.length === 0){
+//     return { 
+//       status : '404',
+//       data : 'No files exist'
+//     };
+//   }
+  
+//   let data = []
+//   for (const file of files) {
+//     try {
+//       if(file && file.length != 0){
+//         const readstream = gfs.createReadStream(file.filename);
+//         const stringData = await streamToString(readstream);
+//         data.push(stringData);
+//       }
+//     } catch (error) {
+//       console.log(error)
+//     }
+//   }
+
+//   return { 
+//     status:'200',
+//     data : data
+//   };
+// } 
+
+async function getEventData (req, res){
+  try {
+    let floors = await getFloors();
+    let logos = await getLogos();
+
+    if (floors.status === 404 || logos.status === 404) {
+      throw new Error('Error while fetching data from database, floors: '+floors.status+', logos: '+logos.status);
+    }
+
+    var eventData = {
+      // eventName: await getEventName(eventId),
+      eventLogo: logos.eventLogo,
+      hostLogo: logos.hostLogo,
+      floors: floors.data
+      // keyWords: await getKeyWords(eventId)
+    }
+    return(res.status(200).json(eventData));
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({err:'Oops, there was an error while fetching event data!'})
+  }
+}
+
+
+// app.get('/interactiveDisplay', getFloors);
+app.get('/interactiveDisplay', getEventData);
 
 // @route GET /
 // @desc Loads form
 app.get('/', (req, res) => {
-  gfs_svg.files.find().toArray((err, files) => {
+  gfs_floors.files.find().toArray((err, files) => {
       // Check if files
       if (!files || files.length === 0) {
         res.render('index', { files: false });
@@ -125,7 +267,7 @@ app.post('/post',floorStorage.single('file_floor'),(req,res) =>{
 // @route GET /files
 // @desc Display all files in JSON
 app.get('/files', (req, res) => {
-  gfs_svg.files.find().toArray((err, files) => {
+  gfs_floors.files.find().toArray((err, files) => {
       if(!files || files.length === 0){
           return res.status(404).json({
               err : 'No files exist'
@@ -140,7 +282,7 @@ app.get('/files', (req, res) => {
 // @route GET /file/:filename
 // @desc Display one file in JSON
 app.get('/files/:filename', (req, res) => {
-  gfs_svg.files.findOne({filename : req.params.filename}, (err, file) => {
+  gfs_floors.files.findOne({filename : req.params.filename}, (err, file) => {
       if(!file || file.length === 0 ){
           return res.status(404).json({
               err : 'No file exists'
@@ -154,33 +296,31 @@ app.get('/files/:filename', (req, res) => {
 // @route GET /Image/:filename
 // @desc Display one file in JSON
 app.get('/image/:filename', (req, res) => {
-  gfs_svg.files.findOne({filename : req.params.filename}, (err, file) => {
-      if(!file || file.length === 0 ){
-          return res.status(404).json({
-              err : 'No file exists'
-          });
-      }
-      //check if image
-      if(file.contentType === 'image/svg+xml'){
-          //Read output tp browser
-          const readstream = gfs_svg.createReadStream(file.filename);
-          console.log('File',file);
-          readstream.pipe(res);
-         
-      } else {
-          res.status(404).json({
-              err : 'Not an SVG'
-          });
-      }
-
-      
+  gfs_floors.files.findOne({filename : req.params.filename}, (err, file) => {
+    if(!file || file.length === 0 ){
+        return res.status(404).json({
+            err : 'No file exists'
+        });
+    }
+    //check if image
+    if(file.contentType === 'image/svg+xml'){
+        //Read output tp browser
+        const readstream = gfs_floors.createReadStream(file.filename);
+        console.log('File',file);
+        readstream.pipe(res);
+        
+    } else {
+        res.status(404).json({
+            err : 'Not an SVG'
+        });
+    }      
   });
 });
 
 // @route DELETE /files/:id
 // @desc Delete file
 app.delete('/files/:id', (req, res) => {
-  gfs_svg.remove({_id: req.params.id, root: 'floor'}, (err, gridStore) => {
+  gfs_floors.remove({_id: req.params.id, root: 'floor'}, (err, gridStore) => {
       if (err){
           return res.status(404).json({err: err});
       }
@@ -192,7 +332,7 @@ app.delete('/files/:id', (req, res) => {
 // @route DELETE /image/:id
 // @desc Delete file
 app.delete('/image/:id', (req, res) => {
-  gfs_svg.remove({_id: req.params.id, root: 'floor'}, (err, gridStore) => {
+  gfs_floors.remove({_id: req.params.id, root: 'floor'}, (err, gridStore) => {
       if (err){
           return res.status(404).json({err: err});
       }
