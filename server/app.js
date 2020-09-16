@@ -12,6 +12,7 @@ const path = require('path');
 const eventRoutes = require('./api/routes/events');
 const svgToSchemaRoutes = require('./api/routes/svgToSchema');
 const storageFunction = require('./utils/storageFunction');
+const fetchFromDB = require('./utils/fetchFromDB');
 const Event = require('./api/models/event');
 
 const conn = require('./utils/connection');
@@ -81,107 +82,12 @@ function uploadWrapper(req, res) {
     console.log('Post error:', err)
   }
 }
-  
-function streamToString (stream) {
-  const chunks = []
-  return new Promise((resolve, reject) => {
-    stream.on('data', chunk => chunks.push(chunk))
-    stream.on('error', reject)
-    stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
-  })
-}
-
-// async function getEventName (req, res){
-// }
-
-async function getKeyWords (eventId = 0){
-  let event = await Event.findOne();
-  if(!event || event.length === 0){
-    return { 
-      status : '404',
-      err : 'Error: event does not exist'
-    };
-  }
-  let keywords = [];
-  for (floor of event.plan.floors){
-    keywords = keywords.concat(floor.keywords);
-  }
-  if(!keywords || keywords.length === 0){
-    return { 
-      status : '404',
-      err : 'Error: keywords do not exist'
-    };
-  }
-  return { 
-    status:'200',
-    data: keywords
-  };
-}
-
-
-async function getLogos(eventId=0){
-  eventLogo = await gfs_event_logo.files.findOne();
-  if(!eventLogo || eventLogo.length === 0){
-    return { 
-      status : '404',
-      err : 'Error: Event logo does not exist'
-    };
-  }
-
-  const eventLogoStream = gfs_event_logo.createReadStream(eventLogo.filename);
-  const eventLogoData = await streamToString(eventLogoStream);
-
-  hostLogo = await gfs_host_logo.files.findOne();
-  if(!hostLogo || hostLogo.length === 0){
-    return { 
-      status : '404',
-      err : 'Error: Host logo does not exist'
-    };
-  }
-
-  return { 
-    status:'200',
-    eventLogo: eventLogoData,
-    hostLogo: hostLogo
-  };
-}
-
-async function getFloors(eventId=0){
-  files = await gfs_floors.files.find().toArray();
-  // console.log('files', files);
-  
-  if(!files || files.length === 0){
-    return { 
-      status : '404',
-      data : 'No floors exist'
-    };
-  }
-  
-  let data = []
-  for (const file of files) {
-    try {
-      if(file && file.length != 0){
-        // console.log(file.filename);
-        const readstream = gfs_floors.createReadStream(file.filename);
-        file.stringData = await streamToString(readstream);
-        data.push(file);
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  return { 
-    status:'200',
-    data : data
-  };
-} 
 
 async function getEventData (req, res){
   try {
-    let floors = await getFloors();
-    let logos = await getLogos();
-    let keyWords = await getKeyWords();
+    let floors = await fetchFromDB.getFloors(gfs_floors);
+    let logos = await fetchFromDB.getLogos(gfs_event_logo, gfs_host_logo);
+    let keyWords = await fetchFromDB.getKeyWords();
 
 
     if (floors.status === 404 || logos.status === 404 || keyWords.status == 404) {
