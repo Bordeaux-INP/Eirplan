@@ -95,6 +95,11 @@ hr{
   justify-content: center;
 }
 
+.rdc{
+  width: 100%;
+  height: 100%;
+}
+
 
 /********************* Buttons ********************/
 .buttons{

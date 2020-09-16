@@ -19,7 +19,8 @@ class App extends React.Component {
     super(props);
     this.state = {
       view: 1,
-      svgData: []
+      svgData: [],
+      floor: ''
     };
     // this.handleClick = this.handleClick.bind(this);
   }
@@ -33,6 +34,9 @@ class App extends React.Component {
       let {data} = await API.getEventData();
       // this.setState({svgData: svgData});
       console.log('data',data);
+      this.setState({floor: data.floors[0].stringData.slice(55)});
+      // console.log('floor',this.state.floor);
+
     } catch (error) {
       console.log('getSvgData error:', error);
     }
@@ -44,16 +48,21 @@ class App extends React.Component {
   // }
 
   render (){
-    const { view } = this.state;
+    const { view } = this.state.view;
+    const buff = new Buffer(this.state.floor);
+    const base64data = buff.toString('base64');
+    console.log('floor',this.state.floor);
+    
+    
     return (
         
       <div className="App">
       <NavBar className="NavBar"/>
       <hr />
 
-      <div className="buttons">
+      {/* <div className="buttons">
       
-      {/* <ButtonGroup
+      <ButtonGroup
         orientation="vertical"
         color="secondary"
         aria-label="vertical contained primary button group"
@@ -63,13 +72,14 @@ class App extends React.Component {
         <Fab onClick={() => this.handleClick(2)}>0</Fab>
         <Fab onClick={() => this.handleClick(3)}>0N</Fab>
  
-      </ButtonGroup> */}
-    </div>
+      </ButtonGroup>
+    </div> */}
     
     {/* {view === 1 ? <SS_SOL /> : view === 2 ? <RDC /> :  <NV_BAT />} */}
+  
+      <img src={`data:image/svg+xml;base64,${base64data }`} className="rdc" alt=""/> 
 
-      {/* <img src={rdc} className="rdc" alt="rdc" />  */}
-
+      
     </div>  
 
     )

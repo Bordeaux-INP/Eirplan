@@ -114,7 +114,7 @@ async function getKeyWords (eventId = 0){
   }
   return { 
     status:'200',
-    keywords: keywords
+    data: keywords
   };
 }
 
@@ -183,6 +183,7 @@ async function getEventData (req, res){
     let logos = await getLogos();
     let keyWords = await getKeyWords();
 
+
     if (floors.status === 404 || logos.status === 404 || keyWords.status == 404) {
       errMsg = 'Error while fetching data from database'
         + 'logos.status: ' + logos.status
@@ -199,6 +200,7 @@ async function getEventData (req, res){
       keyWords: keyWords.data
     }
     // return res.render(logos.hostLogo);
+    // console.log('Kewords',keyWords);
     return(res.status(200).json(eventData));
 
   } catch (error) {
