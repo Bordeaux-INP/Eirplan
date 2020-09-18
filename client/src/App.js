@@ -1,10 +1,14 @@
 import React from 'react';
+import parser from 'react-xml-parser';
 
 import NavBar from './components/navBar';
 
 // import SVG from "./components/SVGs/svg";
 import logo from "./logo.svg"
 import rdc from "./SVG/RDC.svg"
+// import testSvg from './SVG/test.svg'
+import {ReactComponent as Icon} from './SVG/RDC4.svg';
+
 import API from "./API"
 
 import Button from '@material-ui/core/Button';
@@ -20,22 +24,27 @@ class App extends React.Component {
     this.state = {
       view: 1,
       svgData: [],
-      floor: ''
+      floor: []
     };
     // this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
-    this.getSvgData();
+    // this.getSvgData();
   }
 
   getSvgData = async () => {
+    let parser = new DOMParser();
     try {
       let {data} = await API.getEventData();
       // this.setState({svgData: svgData});
       console.log('data',data);
-      this.setState({floor: data.floors[0].stringData.slice(55)});
+      // const floor = parser.parseFromString(data.floors[0].stringData,'text/xml');
+      this.setState({floor: data.floors[0].stringData});
+      // this.setState({floor: floor});
+
       // console.log('floor',this.state.floor);
+      
 
     } catch (error) {
       console.log('getSvgData error:', error);
@@ -49,9 +58,10 @@ class App extends React.Component {
 
   render (){
     const { view } = this.state.view;
-    const buff = new Buffer(this.state.floor);
-    const base64data = buff.toString('base64');
-    console.log('floor',this.state.floor);
+    // const buff = new Buffer(this.state.floor);
+    // const base64data = buff.toString('base64');
+    // const base64data = buff.toString('utf-8');
+    // console.log('floor',this.state.floor);
     
     
     return (
@@ -77,8 +87,24 @@ class App extends React.Component {
     
     {/* {view === 1 ? <SS_SOL /> : view === 2 ? <RDC /> :  <NV_BAT />} */}
   
-      <img src={`data:image/svg+xml;base64,${base64data }`} className="rdc" alt=""/> 
+      {/* <img src={`data:image/svg+xml;base64,${base64data}`} className="rdc" alt=""/>  */}
+      {/* <img src={`data:image/svg+xml;utf8,${base64data}`} className="rdc" alt=""/>  */}
+      {/* <img src={`data:image/svg+xml,${this.state.floor }`} className="rdc" alt=""/>  */}
+      {/* <img src={this.state.floor } className="rdc" alt=""/>  */}
+      {/* <img src={rdc } className="rdc" alt=""/>  */}
+      {/* <img src={testSvg} className={"test_svg"} alt=""/>  */}
+      {/* <object type="image/svg+xml" data="testSvg" width="100%" height="100%"></object> */}
+      {/* <object type="image/svg+xml" data="./SVG/test.svg" width="100%" height="100%"></object> */}
+      
+      {/* <div>
+        {this.state.floor}
+      </div> */}
+      {/* <span dangerouslySetInnerHTML={{__html: this.state.floor}} />; */}
 
+
+        <div className='home'>
+            <Icon className='home__icon'/>
+        </div>
       
     </div>  
 

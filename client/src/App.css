@@ -107,7 +107,29 @@ hr{
   justify-content: flex-end;
   float: right;
 }
+/* 
+path {
+  fill:#00ff6a;
+  fill-opacity:1;
+  stroke:#2346e6;
+  stroke-width:0.5;
+  stroke-opacity:1;
+} */
 
-#buffet:hover{
-background-color: aqua;
+/* .home__icon:hover g g {
+
+  fill:aqua;
+ } */
+ 
+path {
+   fill:red;
 }
+
+path:hover {
+  fill:aqua;
+}
+
+/* .home__icon path {
+  stroke: #e5e5e5;
+  stroke-width: 0.5;
+ } */

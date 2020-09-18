@@ -28,14 +28,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(methodOverride('_methode'));
 
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin','*');
-//   res.header('Access-Control-Allow-Headers','Origin, X-Requested-With, Accept, Autherization, Content-Type');
-//   if (req.method === 'OPTIONS'){
-//     res.header('Access-Control-Allow-Methods','PUT, GET, POST, PATCH, DELETE');
-//     return res.status(200).json({});
-//   }
-// });
 
 let gfs_floors;
 let gfs_event_logo;
@@ -66,22 +58,25 @@ const floorStorage = storageFunction('floor', mongoURI);
 const eventLogoStorage = storageFunction('event_logo', mongoURI);
 const hostLogoStorage = storageFunction('host_logo', mongoURI);
 
-function uploadWrapper(req, res) {
-  try{
-    console.log('start try');
+// async function uploadWrapper(req, res) {
+//   try{
+//     console.log('start try');
+//     // console.log('request',req);
+//     // await eventLogoStorage.single('file_event_logo');
+//     // console.log('event');
 
-    eventLogoStorage.single('file_event_logo');
-    console.log('event');
+//     // await hostLogoStorage.single('file_host_logo');
+//     // console.log('host');
+//     await floorStorage.array(req.body.file_floor);
+//     console.log('file floor');
 
-    hostLogoStorage.single('file_host_logo');
-    console.log('host');
-    floorStorage.single('file_floor');
-    console.log('file floor');
+//     res.redirect('/');
+//     res.end('done');
 
-  }catch(err){
-    console.log('Post error:', err)
-  }
-}
+//   } catch(err) {
+//     console.log('Post error:', err)
+//   }
+// }
 
 async function getEventData (req, res){
   try {
@@ -122,45 +117,43 @@ app.get('/interactiveDisplay', cors(), getEventData);
 
 // @route GET /
 // @desc Loads form
-// app.get('/', (req, res) => {
-//   gfs_floors.files.find().toArray((err, files) => {
-//       // Check if files
-//       if (!files || files.length === 0) {
-//         res.render('index', { files: false });
-//       } else {
-//         files.map(file => {
-//           if (
-//             file.contentType === 'image/svg+xml' || file.contentType === 'image/png'
-//           ) {
-//             file.isImage = true;
-//           } else {
-//             file.isImage = false;
-//           }
-//         });
-//         res.render('index', { files: files });
-//       }
-//     });
-// });
+app.get('/', (req, res) => {
+  console.log("you are in /")
+  gfs_floors.files.find().toArray((err, files) => {
+      // Check if files
+      if (!files || files.length === 0) {
+        res.render('index', { files: false });
+      } else {
+        files.map(file => {
+          if (
+            file.contentType === 'image/svg+xml' || file.contentType === 'image/png'
+          ) {
+            file.isImage = true;
+          } else {
+            file.isImage = false;
+          }
+        });
+        res.render('index', { files: files });
+      }
+    });
+});
 
 
 // // user click on submit button => uploads all the file to DBs
-// // app.post('/post', uploadWrapper, (req, res) => {
+// app.post('/floors', uploadWrapper);
 
-// //   res.redirect('/');
-// //   res.end('done');
 
-// // });
 
-// app.post('/post',floorStorage.single('file_floor'),(req,res) =>{
-//   res.redirect('/');
-// });
-// // app.post('/post',eventLogoStorage.single('file_event_logo'),(req,res) =>{
-// //   res.redirect('/');
-// // });
+app.post('/floors',floorStorage.array('file_floor'),(req,res) =>{
+  res.redirect('/');
+});
+app.post('/eventLogo',eventLogoStorage.single('file_event_logo'),(req,res) =>{
+  res.redirect('/');
+});
 
-// // app.post('/post',hostLogoStorage.single('file_host_logo'),(req,res) =>{
-// //   res.redirect('/');
-// // });
+app.post('/hostLogo',hostLogoStorage.single('file_host_logo'),(req,res) =>{
+  res.redirect('/');
+});
 
 
 // // @route GET /files
