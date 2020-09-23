@@ -151,10 +151,24 @@ import ReactDOM from "react-dom";
 import Taiwan from "@svg-maps/taiwan";
 // import Taiwan from "./SVG/tunisia";
 import { RadioSVGMap } from "react-svg-map";
-
-import API from "./API"
-
 import "./map.scss";
+
+// class App extends React.Component {
+//   constructor(props) {
+//     super(props);
+//   }
+//   handleClick(){
+//       console.log('propst',this.props);
+//   }
+//   render() {
+   
+//     return (
+//     <RadioSVGMap onClick={this.handleClick()} map={Taiwan} />
+   
+    
+//     );
+//   }
+// }
 
 class App extends React.Component {
 	constructor(props) {
@@ -165,10 +179,32 @@ class App extends React.Component {
 			pointedLocation: null,
 			focusedLocation: null,
       selectedLocation: null,
-      floorMaps: {},
-      currentMap: 0,
-      mapsCount: 0,
-      loaded: false,
+      floorMaps: [],
+      testMap:{
+        label: "Map of RDC",
+        viewBox: "0 0 300 500",
+        locations:[
+          {
+            name: "capgemini",
+            id: "capgemini",
+            path: "m 145.26099,100.09245 h 6.41447 v 2.93997 h -6.41447 z",
+            desc: "Description of capgemini"
+          },
+          {
+            name: "bouygues",
+            id: "bouygues",
+            path: "m 156.61993,99.156998 h 6.41447 v 2.939962 h -6.41447 z",
+            desc: "Description of bouygues"
+          },
+          {
+            name: "wall",
+            id: "wall",
+            path: "M 104.6994,161.58482 -0.13363476,159.69354 v -49.71213 m 206.69762476,30.81472 -0.36555,21.30284 -65.78029,-0.51415 m 7.18156,-41.38839 c 0,5.21876 -5.45754,9.4494 -12.18974,9.4494 -6.7322,0 -12.18973,-4.23064 -12.18973,-9.4494 0,-5.21876 5.45752,-9.44941 12.18973,-9.44941 6.73221,0 12.18974,4.23064 12.18974,9.44941 z m 58.96428,20.5997 -66.7128,-0.37798 0.56696,21.16667 H 104.6994 l 0.18899,-20.97768 -105.03275491,-1.25807 0.0107302,-29.36766 L 207.13095,93.171131 Z",
+            desc: "Description of wall"
+          },
+
+        ]
+      }
 		};
 
 		this.handleLocationMouseOver = this.handleLocationMouseOver.bind(this);
@@ -177,33 +213,26 @@ class App extends React.Component {
 		this.handleLocationBlur = this.handleLocationBlur.bind(this);
 		this.handleOnChange = this.handleOnChange.bind(this);
   }
-  componentDidMount() {
-    this.fetchEventData();
-  }
+  // componentDidMount() {
+  //   this.getSvgData();
+  // }
 
-  fetchEventData = async () => {
-    try {
-      let {data} = await API.getEventData();
-      // console.log('Data',data);
+  // getSvgData = async () => {
+  //   try {
+  //     let {data} = await API.getEventData();
      
-      this.setState({floorMaps: data.plan.floors});
-      this.setState({loaded: true});
+  //     this.setState({floor: data.floors[2].stringData});
 
-    } catch (error) {
-      console.log('getSvgData error:', error);
-    }
-  }
+  //   } catch (error) {
+  //     console.log('getSvgData error:', error);
+  //   }
+  // }
 
-  getLocationName(event){
-    return event.target.attributes.name.value;
-  }
-
-  getLocationDesc(event) {
-    // console.log(event.target.attributes);
+  getLocationName(event) {
+    console.log(event.target.attributes);
     let id = event.target.attributes.name.value;
 
-    for (const path of this.state.floorMaps[0].locations) {
-      // for (const path of this.state.floorMaps[this.state.currentMap].locations) {
+    for (const path of this.state.testMap.locations) {
       if (path.id === id){
         return path.desc;
       }
@@ -211,7 +240,7 @@ class App extends React.Component {
   }
 
 	handleLocationMouseOver(event) {
-		const pointedLocation = this.getLocationDesc(event);
+		const pointedLocation = this.getLocationName(event);
 		this.setState({ pointedLocation: pointedLocation });
 	}
 
@@ -220,7 +249,7 @@ class App extends React.Component {
 	}
 
 	handleLocationFocus(event) {
-		const focusedLocation = this.getLocationDesc(event);
+		const focusedLocation = this.getLocationName(event);
 		this.setState({ focusedLocation: focusedLocation });
 	}
 
@@ -240,43 +269,38 @@ class App extends React.Component {
 	render() {
 
     // console.log('taiwan',Taiwan);
-    console.log('testMap',this.state.floorMaps[0]);
-    if (this.state.loaded){
-      return (
-        <article className="examples__block">
-          <h2 className="examples__block__title">
-            Taiwan SVG map as radio buttons
-          </h2>
-          <div className="examples__block__info">
-            <div className="examples__block__info__item">
-              Pointed location: {this.state.pointedLocation}
-            </div>
-            <div className="examples__block__info__item">
-              Focused location: {this.state.focusedLocation}
-            </div>
-            <div className="examples__block__info__item">
-              Selected location: {this.state.selectedLocation}
-            </div>
-          </div>
-          <div className="container">
-          <div className="examples__block__map examples__block__map--Taiwan">
-            <RadioSVGMap
-              map={this.state.floorMaps[0]}
-              onLocationMouseOver={this.handleLocationMouseOver}
-              onLocationMouseOut={this.handleLocationMouseOut}
-              onLocationFocus={this.handleLocationFocus}
-              onLocationBlur={this.handleLocationBlur}
-              onChange={this.handleOnChange} />
-          </div>
-          </div>
-        </article>
-      );
-    } else {
-      return (
-        <div>Loading....</div>
-      )
-    }
+    // console.log('testMap',this.state.testMap);
+
     
+		return (
+			<article className="examples__block">
+				<h2 className="examples__block__title">
+					Taiwan SVG map as radio buttons
+				</h2>
+				<div className="examples__block__info">
+					<div className="examples__block__info__item">
+						Pointed location: {this.state.pointedLocation}
+					</div>
+					<div className="examples__block__info__item">
+						Focused location: {this.state.focusedLocation}
+					</div>
+					<div className="examples__block__info__item">
+						Selected location: {this.state.selectedLocation}
+					</div>
+				</div>
+        <div className="container">
+				<div className="examples__block__map examples__block__map--Taiwan">
+					<RadioSVGMap
+						map={this.state.testMap}
+						onLocationMouseOver={this.handleLocationMouseOver}
+						onLocationMouseOut={this.handleLocationMouseOut}
+						onLocationFocus={this.handleLocationFocus}
+						onLocationBlur={this.handleLocationBlur}
+						onChange={this.handleOnChange} />
+				</div>
+        </div>
+			</article>
+		);
 	}
 }
 
