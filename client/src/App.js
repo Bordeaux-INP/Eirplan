@@ -148,9 +148,13 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import Taiwan from "@svg-maps/taiwan";
-// import Taiwan from "./SVG/tunisia";
 import { RadioSVGMap } from "react-svg-map";
+
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import Fab from '@material-ui/core/Fab';
+
+import NavBar from './components/navBar';
 
 import API from "./API"
 
@@ -184,9 +188,9 @@ class App extends React.Component {
   fetchEventData = async () => {
     try {
       let {data} = await API.getEventData();
-      // console.log('Data',data);
      
       this.setState({floorMaps: data.plan.floors});
+      this.setState({mapsCount: data.plan.floors.length});
       this.setState({loaded: true});
 
     } catch (error) {
@@ -201,8 +205,11 @@ class App extends React.Component {
   getLocationDesc(event) {
     // console.log(event.target.attributes);
     let id = event.target.attributes.name.value;
+    let currentMap = this.state.currentMap;
 
-    for (const path of this.state.floorMaps[0].locations) {
+    console.log(currentMap)
+
+    for (const path of this.state.floorMaps[currentMap].locations) {
       // for (const path of this.state.floorMaps[this.state.currentMap].locations) {
       if (path.id === id){
         return path.desc;
@@ -237,12 +244,27 @@ class App extends React.Component {
 		});
 	}
 
+  handleClick(increment) {
+
+    let newMap = this.state.currentMap + increment;
+
+    newMap = Math.min(Math.max(newMap, 0), this.state.mapsCount-1);
+
+    this.setState( {currentMap: newMap} );
+
+    console.log(this.state);
+  }
 	render() {
 
-    // console.log('taiwan',Taiwan);
-    console.log('testMap',this.state.floorMaps[0]);
     if (this.state.loaded){
+      let currentMap = this.state.currentMap;
+      
+      console.log('Current map check for wall id',this.state.floorMaps[currentMap]);
+
       return (
+        <div>
+          {/* <NavBar className="NavBar"/>   */}
+      
         <article className="examples__block">
           <h2 className="examples__block__title">
             Taiwan SVG map as radio buttons
@@ -259,9 +281,24 @@ class App extends React.Component {
             </div>
           </div>
           <div className="container">
+            <div className="buttons">
+      
+      <ButtonGroup
+        orientation="vertical"
+        color="secondary"
+        aria-label="vertical contained primary button group"
+        variant="contained"
+      >
+        <Fab onClick={() => this.handleClick(1)}>+</Fab>
+        <Fab onClick={() => this.handleClick(-1)}>-</Fab>
+ 
+      </ButtonGroup>
+    </div> 
+    
+    {/* {view === 1 ? <SS_SOL /> : view === 2 ? <RDC /> :  <NV_BAT />}  */}
           <div className="examples__block__map examples__block__map--Taiwan">
             <RadioSVGMap
-              map={this.state.floorMaps[0]}
+              map={this.state.floorMaps[currentMap]}
               onLocationMouseOver={this.handleLocationMouseOver}
               onLocationMouseOut={this.handleLocationMouseOut}
               onLocationFocus={this.handleLocationFocus}
@@ -270,6 +307,7 @@ class App extends React.Component {
           </div>
           </div>
         </article>
+        </div>
       );
     } else {
       return (
