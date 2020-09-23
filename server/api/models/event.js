@@ -4,20 +4,18 @@ const mongooseUniqueValidator = require('mongoose-unique-validator');
 
 const localizedKeywordsSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
+    id: String,
     name: String,
-    description: String,
-    logo: String,
-    position : String
-    // position : { type: String , coordinates: [Number, Number] } 
-
+    desc: String,
+    path: String,
 });
 
 const floorSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: {type: String, unique: true},
-    svg: String,
-    keywords : [localizedKeywordsSchema]
-
+    viewBox: String,
+    label: String,
+    locations: [localizedKeywordsSchema]
 });
 floorSchema.plugin(mongooseUniqueValidator);
 
@@ -27,8 +25,6 @@ const planSchema = mongoose.Schema({
     name: String,
     floors: [floorSchema]
 });
-
-
 
 const eventSchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,

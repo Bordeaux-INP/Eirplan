@@ -175,9 +175,11 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
+     
 			pointedLocation: null,
 			focusedLocation: null,
       selectedLocation: null,
+      floorMaps: [],
       testMap:{
         label: "Map of RDC",
         viewBox: "0 0 300 500",
@@ -185,17 +187,20 @@ class App extends React.Component {
           {
             name: "capgemini",
             id: "capgemini",
-            path: "m 145.26099,100.09245 h 6.41447 v 2.93997 h -6.41447 z"
+            path: "m 145.26099,100.09245 h 6.41447 v 2.93997 h -6.41447 z",
+            desc: "Description of capgemini"
           },
           {
             name: "bouygues",
             id: "bouygues",
-            path: "m 156.61993,99.156998 h 6.41447 v 2.939962 h -6.41447 z"
+            path: "m 156.61993,99.156998 h 6.41447 v 2.939962 h -6.41447 z",
+            desc: "Description of bouygues"
           },
           {
             name: "wall",
             id: "wall",
-            path: "M 104.6994,161.58482 -0.13363476,159.69354 v -49.71213 m 206.69762476,30.81472 -0.36555,21.30284 -65.78029,-0.51415 m 7.18156,-41.38839 c 0,5.21876 -5.45754,9.4494 -12.18974,9.4494 -6.7322,0 -12.18973,-4.23064 -12.18973,-9.4494 0,-5.21876 5.45752,-9.44941 12.18973,-9.44941 6.73221,0 12.18974,4.23064 12.18974,9.44941 z m 58.96428,20.5997 -66.7128,-0.37798 0.56696,21.16667 H 104.6994 l 0.18899,-20.97768 -105.03275491,-1.25807 0.0107302,-29.36766 L 207.13095,93.171131 Z"
+            path: "M 104.6994,161.58482 -0.13363476,159.69354 v -49.71213 m 206.69762476,30.81472 -0.36555,21.30284 -65.78029,-0.51415 m 7.18156,-41.38839 c 0,5.21876 -5.45754,9.4494 -12.18974,9.4494 -6.7322,0 -12.18973,-4.23064 -12.18973,-9.4494 0,-5.21876 5.45752,-9.44941 12.18973,-9.44941 6.73221,0 12.18974,4.23064 12.18974,9.44941 z m 58.96428,20.5997 -66.7128,-0.37798 0.56696,21.16667 H 104.6994 l 0.18899,-20.97768 -105.03275491,-1.25807 0.0107302,-29.36766 L 207.13095,93.171131 Z",
+            desc: "Description of wall"
           },
 
         ]
@@ -208,9 +213,30 @@ class App extends React.Component {
 		this.handleLocationBlur = this.handleLocationBlur.bind(this);
 		this.handleOnChange = this.handleOnChange.bind(this);
   }
+  // componentDidMount() {
+  //   this.getSvgData();
+  // }
+
+  // getSvgData = async () => {
+  //   try {
+  //     let {data} = await API.getEventData();
+     
+  //     this.setState({floor: data.floors[2].stringData});
+
+  //   } catch (error) {
+  //     console.log('getSvgData error:', error);
+  //   }
+  // }
 
   getLocationName(event) {
-    return event.target.attributes.name.value;
+    console.log(event.target.attributes);
+    let id = event.target.attributes.name.value;
+
+    for (const path of this.state.testMap.locations) {
+      if (path.id === id){
+        return path.desc;
+      }
+    }
   }
 
 	handleLocationMouseOver(event) {
@@ -242,8 +268,8 @@ class App extends React.Component {
 
 	render() {
 
-    console.log('taiwan',Taiwan);
-    console.log('testMap',this.state.testMap);
+    // console.log('taiwan',Taiwan);
+    // console.log('testMap',this.state.testMap);
 
     
 		return (
@@ -262,6 +288,7 @@ class App extends React.Component {
 						Selected location: {this.state.selectedLocation}
 					</div>
 				</div>
+        <div className="container">
 				<div className="examples__block__map examples__block__map--Taiwan">
 					<RadioSVGMap
 						map={this.state.testMap}
@@ -271,6 +298,7 @@ class App extends React.Component {
 						onLocationBlur={this.handleLocationBlur}
 						onChange={this.handleOnChange} />
 				</div>
+        </div>
 			</article>
 		);
 	}

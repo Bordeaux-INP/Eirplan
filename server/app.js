@@ -9,11 +9,11 @@ const methodOverride = require('method-override');
 const path = require('path');
 
 
-const eventRoutes = require('./api/routes/events');
 const svgToSchemaRoutes = require('./api/routes/svgToSchema');
 const storageFunction = require('./utils/storageFunction');
 const fetchFromDB = require('./utils/fetchFromDB');
 const Event = require('./api/models/event');
+const createEvent = require('./utils/createEvent');
 
 const conn = require('./utils/connection');
 const mongoURI = 'mongodb+srv://eirplan:eirplan@eirplan.dprmb.mongodb.net/Eirplan?retryWrites=true&w=majority';
@@ -100,9 +100,14 @@ async function getEventData (req, res){
       floors: floors.data,
       keyWords: keyWords.data
     }
+
+  
+  
     // return res.render(logos.hostLogo);
     // console.log('Kewords',keyWords);
     return(res.status(200).json(eventData));
+    // return(res.status(200).json(event));
+
 
   } catch (error) {
     console.log(error);
@@ -110,6 +115,30 @@ async function getEventData (req, res){
   }
   // return res.status(200).send({eventData: 'wtf is this'});
 }
+
+createEventCallBack = async function (){
+  try{
+
+  let floors = await fetchFromDB.getFloors(gfs_floors);
+  let logos = await fetchFromDB.getLogos(gfs_event_logo, gfs_host_logo);
+  let eventName = 'Ingénib';
+  let hostName = 'Enseirb-Matmeca';
+
+  let floorXmls = []
+  let fileNames = []
+  for (const floor of floors.data) {
+    floorXmls.push(floor.stringData);
+    fileNames.push(floor.filename);
+  }
+// console.log('create event params',eventName, hostName, logos.eventLogo._id, logos.hostLogo._id, floorXmls, fileNames);
+  event = createEvent(eventName, hostName, logos.eventLogo._id, logos.hostLogo._id, floorXmls, fileNames);
+  console.log(event);
+  return (event);
+} catch(err){
+  console.log(err);
+}
+}
+
 
 
 // app.get('/interactiveDisplay', getFloors);
@@ -138,12 +167,6 @@ app.get('/', (req, res) => {
     });
 });
 
-
-// // user click on submit button => uploads all the file to DBs
-// app.post('/floors', uploadWrapper);
-
-
-
 app.post('/floors',floorStorage.array('file_floor'),(req,res) =>{
   res.redirect('/');
 });
@@ -154,6 +177,32 @@ app.post('/eventLogo',eventLogoStorage.single('file_event_logo'),(req,res) =>{
 app.post('/hostLogo',hostLogoStorage.single('file_host_logo'),(req,res) =>{
   res.redirect('/');
 });
+
+app.post('/createEvent', async (req, res, next) =>  {
+  try{
+
+  let event = await createEventCallBack();
+  console.log(event);
+
+  event 
+  .save()
+  .then(result => {
+    console.log(result);
+    res.redirect('/');
+  })
+  .catch(err => console.log(err)) ;
+
+  res.status(200).json({
+    message : 'Handeling POST requests to /events',
+    createdData: event
+  });
+  }catch(err){
+    console.log(err);
+  }
+})
+
+
+app.use('/svgToSchema', svgToSchemaRoutes);
 
 
 // // @route GET /files
@@ -240,7 +289,6 @@ app.post('/hostLogo',hostLogoStorage.single('file_host_logo'),(req,res) =>{
 
 // ****************************************************************************** //
 
-app.use('/svgToSchema', svgToSchemaRoutes);
 
 
 
