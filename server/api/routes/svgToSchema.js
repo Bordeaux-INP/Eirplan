@@ -7,6 +7,7 @@ const XmlReader = require('../../utils/xmlReader');
 
 let svgFile = XmlReader.svgReader('RDC.svg');
 let Stands = svgFile.svg.g.g.path;
+// console.log('x',Stands.d);
 
 var localizedKeywords = [];
 Stands.forEach(function(item) {

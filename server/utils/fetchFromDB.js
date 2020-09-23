@@ -1,4 +1,7 @@
 const Event = require('../api/models/event');
+// const parseXML = require('xml-parse-from-string');
+// const stringify = require('xml-stringify');
+// var DOMParser = require('xmldom').DOMParser;
 
 
 function streamToString (stream) {
@@ -78,6 +81,17 @@ async function getFloors(gfs_floors, eventId=0){
         if(file && file.length != 0){
           // console.log(file.filename);
           const readstream = gfs_floors.createReadStream(file.filename);
+          // const stringData = await streamToString(readstream);
+          // console.log('stringData',stringData);
+          // var doc = new DOMParser().parseFromString(stringData,'text/xml');
+          // console.log('doc XML', doc.getElementsByTagName('PATH')[0]);
+          // // const xmlData = parseXML(stringData);
+          // // console.log('xmlData',xmlData);
+          // // for(path of xmlData.getElementByTagName('PATH')){
+          // //   if(path.desc){
+          // //     path.removeAttribute("style");
+          // //   }
+          // // }
           file.stringData = await streamToString(readstream);
           data.push(file);
         }

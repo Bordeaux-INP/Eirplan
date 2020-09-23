@@ -122,14 +122,51 @@ path {
  } */
  
 path {
-   fill:red;
+  fill:red;
 }
 
 path:hover {
   fill:aqua;
 }
+desc {
+  color: aliceblue;
+}
+/* .hide {
+  display: none;
+} */
+
+#svg-data{
+  /* display: none; */
+  color: white;
+
+}
+
+#hide{
+  color: white;
+}
+
+/* path:hover desc{
+  display: none;
+  display: block;
+  color: red;
+  background: #ccc;
+} */
+
+/* .hide:hover ~ path {
+  display: block;
+  color: rgb(0, 255, 136);
+  background: #ccc;
+  fill: beige;
+  
+} */
+/* 
+#a:hover ~ #b {
+  background: #ccc
+} */
 
 /* .home__icon path {
   stroke: #e5e5e5;
   stroke-width: 0.5;
  } */
+
+ 
