@@ -145,6 +145,33 @@
     
 //   }
 // }
+  // Words.text
+    //   for(var i = 0; i<5;i++){
+       
+    //     wordsString = data.plan.floors[0].locations[i].desc;
+    //   }
+    //   console.log('words',wordsString);
+
+    //   for(var i = 0; i<wordsString.length;i++){
+       
+    //     ar.push(wordsString[i].split(' '));
+    //   }
+    //  console.log('words',ar);
+
+//     for(var i = 0; i<ar.length;i++){
+//       Words.push(ar[i]);
+//       // this.setState({words[{text}] : Words} );
+//  }
+//  for(var i = 0; i<Words.length;i++){
+
+//   wordsData.push({text: Words[i], value: 1});
+// }
+// this.setState({words : wordsData} );
+
+
+// console.log('words',this.state.words);
+
+
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -153,6 +180,7 @@ import { RadioSVGMap } from "react-svg-map";
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Fab from '@material-ui/core/Fab';
+import ReactWordcloud from 'react-wordcloud';
 
 import NavBar from './components/navBar';
 
@@ -170,6 +198,7 @@ class App extends React.Component {
 			focusedLocation: null,
       selectedLocation: null,
       floorMaps: {},
+      words:[{}],
       currentMap: 0,
       mapsCount: 0,
       loaded: false,
@@ -179,22 +208,45 @@ class App extends React.Component {
 		this.handleLocationMouseOut = this.handleLocationMouseOut.bind(this);
 		this.handleLocationFocus = this.handleLocationFocus.bind(this);
 		this.handleLocationBlur = this.handleLocationBlur.bind(this);
-		this.handleOnChange = this.handleOnChange.bind(this);
+    this.handleOnChange = this.handleOnChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
   componentDidMount() {
     this.fetchEventData();
   }
 
   fetchEventData = async () => {
+    let Words = [];
+    let wordsData = [];
+    let wordsString;
     try {
+
       let {data} = await API.getEventData();
-     
+     console.log('data',data);
       this.setState({floorMaps: data.plan.floors});
       this.setState({mapsCount: data.plan.floors.length});
       this.setState({loaded: true});
+      // Words.text
+     
+  //      wordsString = data.plan.floors[0].locations[0].desc;
+  //      var ar = wordsString.split(' ');
+  //      for(var i = 0; i<ar.length;i++){
+  //           Words.push(ar[i]);
+  //           // this.setState({words[{text}] : Words} );
+  //      }
+  //      for(var i = 0; i<Words.length;i++){
+      
+  //       wordsData.push({text: Words[i], value: 1});
+  //  }
+  //     this.setState({words : wordsData} );
+
+
+  //    console.log('words',this.state.words);
+
+
 
     } catch (error) {
-      console.log('getSvgData error:', error);
+      console.log('fetchEventData error:', error);
     }
   }
 
@@ -218,7 +270,7 @@ class App extends React.Component {
   }
 
 	handleLocationMouseOver(event) {
-		const pointedLocation = this.getLocationDesc(event);
+		const pointedLocation = this.getLocationName(event);
 		this.setState({ pointedLocation: pointedLocation });
 	}
 
@@ -262,39 +314,25 @@ class App extends React.Component {
       console.log('Current map check for wall id',this.state.floorMaps[currentMap]);
 
       return (
-        <div>
-          {/* <NavBar className="NavBar"/>   */}
+        <div className="App">
+          <NavBar className="NavBar"/>  
       
         <article className="examples__block">
-          <h2 className="examples__block__title">
-            Taiwan SVG map as radio buttons
-          </h2>
-          <div className="examples__block__info">
-            <div className="examples__block__info__item">
-              Pointed location: {this.state.pointedLocation}
-            </div>
-            <div className="examples__block__info__item">
-              Focused location: {this.state.focusedLocation}
-            </div>
-            <div className="examples__block__info__item">
-              Selected location: {this.state.selectedLocation}
-            </div>
-          </div>
           <div className="container">
             <div className="buttons">
       
-      <ButtonGroup
-        orientation="vertical"
-        color="secondary"
-        aria-label="vertical contained primary button group"
-        variant="contained"
-      >
-        <Fab onClick={() => this.handleClick(1)}>+</Fab>
-        <Fab onClick={() => this.handleClick(-1)}>-</Fab>
- 
-      </ButtonGroup>
-    </div> 
-    
+              <ButtonGroup
+                orientation="vertical"
+                color="secondary"
+                aria-label="vertical contained primary button group"
+                variant="contained"
+              >
+                <Fab onClick={() => this.handleClick(1)}>+</Fab>
+                <Fab onClick={() => this.handleClick(-1)}>-</Fab>
+        
+              </ButtonGroup>
+            </div> 
+            
     {/* {view === 1 ? <SS_SOL /> : view === 2 ? <RDC /> :  <NV_BAT />}  */}
           <div className="examples__block__map examples__block__map--Taiwan">
             <RadioSVGMap
@@ -306,7 +344,21 @@ class App extends React.Component {
               onChange={this.handleOnChange} />
           </div>
           </div>
+          <div className="standInformation">
+            <div className="examples__block__info">
+              <div className="examples__block__info__item">
+                Pointed location: {this.state.pointedLocation}
+              </div>
+              <div className="examples__block__info__item">
+                Focused location: {this.state.focusedLocation}
+              </div>
+              <div className="examples__block__info__item">
+                Selected location: {this.state.selectedLocation}
+              </div>
+            </div>
+          </div>
         </article>
+        {/* <ReactWordcloud words={this.state.words} /> */}
         </div>
       );
     } else {

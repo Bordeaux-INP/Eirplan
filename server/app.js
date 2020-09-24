@@ -1,12 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-// const multer = require('multer');
-// const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 const methodOverride = require('method-override');
-// const crypto = require('crypto');
-const path = require('path');
 
 
 const svgToSchemaRoutes = require('./api/routes/svgToSchema');
@@ -78,43 +74,28 @@ const hostLogoStorage = storageFunction('host_logo', mongoURI);
 //   }
 // }
 
-// async function getEventData (req, res){
-//   try {
-//     let floors = await fetchFromDB.getFloors(gfs_floors);
-//     let logos = await fetchFromDB.getLogos(gfs_event_logo, gfs_host_logo);
-//     let keyWords = await fetchFromDB.getKeyWords();
+async function getEventLogos (req, res){
+  try {
+    let logos = await fetchFromDB.getLogos(gfs_event_logo, gfs_host_logo);
 
 
-//     if (floors.status === 404 || logos.status === 404 || keyWords.status == 404) {
-//       errMsg = 'Error while fetching data from database'
-//         + 'logos.status: ' + logos.status
-//         + 'floors.status: ' + floors.status
-//         + 'keyWords.status: ' + keyWords.status;
-//       throw new Error(errMsg);
-//     }
+    if (logos.status === 404) {
+      errMsg = 'Error while fetching Logos from database'
+        + 'logos.status: ' + logos.status;
+      throw new Error(errMsg);
+    }
 
-//     var eventData = {
-//       // eventName: await getEventName(eventId),
-//       eventLogo: logos.eventLogo,
-//       hostLogo: logos.hostLogo,
-//       floors: floors.data,
-//       keyWords: keyWords.data
-//     }
+    var eventLogos = {
+      eventLogo: logos.eventLogo,
+      hostLogo: logos.hostLogo
+    }
+    return(res.status(200).json(eventLogos));
 
-  
-  
-//     // return res.render(logos.hostLogo);
-//     // console.log('Kewords',keyWords);
-//     return(res.status(200).json(eventData));
-//     // return(res.status(200).json(event));
-
-
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(404).json({err:'Oops, there was an error while fetching event data!'})
-//   }
-//   // return res.status(200).send({eventData: 'wtf is this'});
-// }
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({err:'Oops, there was an error while fetching event Logos!'})
+  }
+}
 
 createEventCallBack = async function (){
   try{
@@ -142,7 +123,8 @@ createEventCallBack = async function (){
 
 
 // app.get('/interactiveDisplay', getFloors);
-// app.get('/interactiveDisplay', cors(), getEventData);
+app.get('/getEventLogos', cors(), getEventLogos);
+
 app.get('/interactiveDisplay', cors(), (req, res) => {
   Event.findOne({}, (err, file) => {
     if(!file || file.length === 0 ){

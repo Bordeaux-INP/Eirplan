@@ -14,4 +14,16 @@ export default {
         console.log('eventData', output);
         return output;
     },
+
+    getEventLogos: async function(eventLogos){
+        console.log('eventLogos', eventLogos);
+        const output = await axios.get(
+            burl + "/getEventLogos",
+            {
+                eventLogos: eventLogos
+            }
+        );
+        console.log('eventLogos', output);
+        return output;
+    },
 }
