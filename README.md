@@ -1,8 +1,7 @@
 # Eirplan
 Eirlplan is a geographic plan for dynamic display on interactive touchscreens 
 
-![Image of the interface](https://octodex.github.com/aalktabe/Eirplan/blob/master/Eirplan/docs/SVG/ecran.png?raw=true)
-
+![Image of the interface](https://ibb.co/Y30Bn9G)
 
 # Pre-require
 Set up npm on your PC : https://www.npmjs.com/get-npm
