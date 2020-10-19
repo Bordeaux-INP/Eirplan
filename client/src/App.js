@@ -81,7 +81,7 @@ class App extends React.Component {
         wordsData.push({text: Words[i], value: 1});
       }
 
-      for(let j=0;j<data.plan.floors[this.state.currentMap].locations.length;j++){
+      for(let j=0;j<data.plan.floors[this.state.currentMap].locations.length -1;j++){
         if(data.plan.floors[this.state.currentMap].locations[j].name !== 'wall'){
           wordsNameString = data.plan.floors[this.state.currentMap].locations[j].name;
         }else{
