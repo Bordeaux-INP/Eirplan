@@ -1,7 +1,7 @@
 # Eirplan
 Eirlplan is a geographic plan for dynamic display on interactive touchscreens 
 
-![Image of the interface](https://octodex.github.com/aalktabe/Eirplan/blob/master/docs/SVG/ecran.png?raw=true)
+![Image of the interface](https://octodex.github.com/aalktabe/Eirplan/blob/master/Eirplan/docs/SVG/ecran.png?raw=true)
 
 
 # Pre-require
